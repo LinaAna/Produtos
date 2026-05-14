@@ -13,7 +13,7 @@ export class produto {
   @Column("varchar")
   name!: string;
 
-  @Column("numeric")
+  @Column("int")
   quant!: number;
 
   @Column("decimal")

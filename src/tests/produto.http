@@ -1,12 +1,26 @@
-POST http://localhost:3000/api/produto
+POST http://localhost:3000/api/produtos
 Content-Type: application/json
 
 {
-    name: "Jumento",
-    quant: 5,
-    price: 500.99
+    "name": "Cavalo-marinho",
+    "quant": 5,
+    "price": 500
 }
 
 ###
 
-GET http:/localhost:3000/api/litar
+GET http://localhost:3000/api/produtos
+
+###
+
+PATCH http://localhost:3000/api/produtos/2
+Content-Type: application/json
+
+{
+    "name": "Jumenta",
+    "quant": 5,
+    "price": 700
+}
+
+###
+DELETE http://localhost:3000/api/produtos/4

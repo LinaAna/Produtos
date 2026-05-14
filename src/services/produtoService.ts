@@ -1,18 +1,26 @@
 import { AppDataSource } from "../data-source.js";
 import { produto } from "../entities/produtos.js";
 
-// getRepository
-export class produtoService {
-  private repo = AppDataSource.getRepository(produto);
-  // gerencia a tabela
+export class ProductServices {
+  private productRepo = AppDataSource.getRepository(produto);
 
-  async create(data: Partial<produto>): Promise<produto> {
-    //cria objeto e passa pro banco
-    const produto = this.repo.create(data);
-    return await this.repo.save(produto);
-  }
-  async lisAll(): Promise<produto[]> {
-    // busca
-    return await this.repo.find();
-  }
+  listAll = async () => {
+    return await this.productRepo.find();
+  };
+
+  create = async (productData: Partial<produto>) => {
+    return await this.productRepo.save(productData);
+  };
+
+  update = async (id: number, productData: Partial<produto>) => {
+    const product = await this.productRepo.findOneBy({ id: id });
+
+    this.productRepo.merge(product!, productData);
+
+    return await this.productRepo.save(product!);
+  };
+
+  delete = async (id: number) => {
+    return this.productRepo.delete(id);
+  };
 }

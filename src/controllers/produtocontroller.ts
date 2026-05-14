@@ -1,19 +1,61 @@
-/*
-201 = criado
-200 = ok
-*/
-import { Request, Response } from "express";
-import { produtoService } from "../services/produtoService.js";
+import type { Request, Response, NextFunction } from "express";
+import { produto } from "../entities/produtos.js";
+import { AppDataSource } from "../data-source.js";
+import { ProductServices } from "../services/produtoService.js";
 
-const service = new produtoService();
+export class ProductsController {
+  private productChecker = AppDataSource.getRepository(produto);
+  private productService = new ProductServices();
 
-export class ProdutoController {
-  async create(req: Request, res: Response) {
-    const produto = await service.create;
-    return res.status(201).json(produto); // criado
-  }
-  async list(req: Request, res: Response) {
-    const produto = await service.lisAll();
-    return res.status(200).json(produto); // ok
-  }
+  get = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const products = await this.productService.listAll();
+      return res.status(200).json(products);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const newProduct = await this.productService.create(req.body);
+
+      return res
+        .status(201)
+        .json({ message: "Produto criado com sucesso", product: newProduct });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  update = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id: number = Number(req.params.id);
+      const exist = await this.productChecker.findOneBy({ id });
+      if (!exist)
+        return res.status(404).json({ message: "Produto não encontrado" });
+
+      const updatedProduct = await this.productService.update(id, req.body);
+      return res.status(200).json({
+        message: "produto atualizado com sucesso",
+        product: updatedProduct,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  delete = async (req: Request, res: Response, next: NextFunction) => {
+    const id: number = Number(req.params.id);
+    const exist = await this.productChecker.findOneBy({ id });
+    if (!exist)
+      return res.status(404).json({ message: "Produto não encontrado" });
+
+    try {
+      await this.productService.delete(id);
+      return res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  };
 }
